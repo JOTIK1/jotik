@@ -176,7 +176,7 @@ export default function Terms() {
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-3 text-gray-900">14. Contact</h2>
-        <p>For questions, contact us at: <strong>tradedjamel@gmail.com</strong></p>
+        <p>For questions, contact us at: <strong>joteam@jotik.online</strong></p>
       </section>
     </main>
   );
