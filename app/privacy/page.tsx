@@ -224,7 +224,7 @@ export default function Privacy() {
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-3 text-gray-900">14. Contact Us</h2>
         <p className="mb-1"><strong>JOTIK</strong></p>
-        <p className="mb-1">Email: <strong>tradedjamel@gmail.com</strong></p>
+        <p className="mb-1">Email: <strong>joteam@jotik.online</strong></p>
         <p className="mb-4">Address: <strong>Bab Ezzouar, Algiers, Algeria</strong></p>
         <p>
           See also our <Link href="/terms" className="text-gray-900 font-medium underline hover:no-underline">Terms of Service</Link>.
