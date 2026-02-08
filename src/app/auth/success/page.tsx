@@ -1,11 +1,21 @@
 // src/app/auth/success/page.tsx
+
+export const dynamic = "force-dynamic";
+
 import { Suspense } from "react";
-import SuccessClient from "@/app/auth/success/success-client"; 
+import SuccessClient from "./SuccessClient";
 
 export default function SuccessPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-gray-600">
+          Loading...
+        </div>
+      }
+    >
       <SuccessClient />
     </Suspense>
   );
 }
+
