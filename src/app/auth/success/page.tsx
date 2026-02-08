@@ -1,20 +1,15 @@
 // src/app/auth/success/page.tsx
-
 export const dynamic = "force-dynamic";
 
-import { Suspense } from "react";
 import SuccessClient from "./SuccessClient";
 
-export default function SuccessPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center text-gray-500">
-          Loading...
-        </div>
-      }
-    >
-      <SuccessClient />
-    </Suspense>
-  );
+type Props = {
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+export default function SuccessPage({ searchParams }: Props) {
+  const raw = searchParams?.status;
+  const status = Array.isArray(raw) ? raw[0] : raw;
+
+  return <SuccessClient status={status ?? "success"} />;
 }
