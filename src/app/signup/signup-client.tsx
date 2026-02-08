@@ -1,5 +1,5 @@
 "use client";
-
+export const dynamic = "force-dynamic";
 import { useState } from "react";
 import AuthCard from "@/app/components/AuthCard";
 import { Mail, Lock, User, Tag } from "lucide-react";
