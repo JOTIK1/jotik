@@ -1,11 +1,10 @@
 "use client";
-export const dynamic = "force-dynamic";
+import { supabase } from "../../../lib/supabaseClient";
 import { useState } from "react";
 import AuthCard from "@/app/components/AuthCard";
 import { Mail, Lock, User, Tag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../../lib/supabaseClient";
 import BrandLogo from "@/app/components/brand-logo";
 
 export default function SignupClient() {
