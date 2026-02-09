@@ -31,63 +31,93 @@ export default function SignupClient() {
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
     const invite = referral.trim();
-
+  
+    // reset UI state
     setFormError(null);
     setFieldError({});
     setLoading(true);
-
+  
+    // 1) client-side validation
     if (!username) {
       setLoading(false);
       setFieldError({ username: true });
       setFormError("الاسم ضروري.");
       return;
     }
+  
     if (!cleanEmail) {
       setLoading(false);
       setFieldError({ email: true });
       setFormError("الإيميل ضروري.");
       return;
     }
+  
     if (!cleanPassword) {
       setLoading(false);
       setFieldError({ password: true });
       setFormError("كلمة السر ضرورية.");
       return;
     }
-
-    const res = await fetch("/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: cleanEmail, password: cleanPassword, username, invite }),
-    });
-
-    const json = await res.json();
-
-    if (!json.ok) {
+  
+    try {
+      // 2) call your API (referral validation + profile creation etc.)
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: cleanEmail,
+          password: cleanPassword,
+          username,
+          invite, // مهم: نفس الاسم اللي يتوقعه الـ API
+        }),
+      });
+  
+      // حاول نقرأ JSON حتى لو السيرفر رجّع خطأ
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+  
+      // إذا API رجّع خطأ (مثلاً referral غلط)
+      if (!res.ok) {
+        const msg =
+          data?.message ||
+          (res.status === 400 ? "بيانات غير صحيحة." : "حدث خطأ في السيرفر.");
+  
+        setLoading(false);
+        setFormError(msg);
+  
+        const field = data?.field; // نتوقع: "username" | "invite" | "email" | "password"
+        if (field === "username") setFieldError({ username: true });
+        else if (field === "invite") setFieldError({ invite: true });
+        else if (field === "email") setFieldError({ email: true });
+        else if (field === "password") setFieldError({ password: true });
+  
+        return;
+      }
+  
+      // 3) login with supabase
+      const { error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password: cleanPassword,
+      });
+  
+      if (error) {
+        setLoading(false);
+        setFormError(error.message);
+        setFieldError({ email: true, password: true });
+        return;
+      }
+  
+      // 4) success
       setLoading(false);
-      const msg = json.message || "حدث خطأ.";
-      setFormError(msg);
-      const f = json.field;
-      if (f === "username") setFieldError({ username: true });
-      else if (f === "invite") setFieldError({ invite: true });
-      else if (msg.toLowerCase().includes("email")) setFieldError({ email: true });
-      return;
+      router.push("/login");
+    } catch (e: any) {
+      setLoading(false);
+      setFormError(e?.message || "تعذر الاتصال بالسيرفر. حاول مرة أخرى.");
     }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: cleanEmail,
-      password: cleanPassword,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setFormError(error.message);
-      setFieldError({ email: true, password: true });
-      return;
-    }
-
-    router.push("/login");
   };
 
   const inputClass = (bad?: boolean) =>
