@@ -1,11 +1,12 @@
 "use client";
-import { supabase } from "../../../lib/supabaseClient";
+
+import { createSupabaseClient } from "../../../lib/supabaseClient";
 import { useState } from "react";
-import AuthCard from "@/app/components/AuthCard";
+import AuthCard from "../../app/components/AuthCard";
 import { Mail, Lock, User, Tag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import BrandLogo from "@/app/components/brand-logo";
+import BrandLogo from "../../app/components/brand-logo";
 
 export default function SignupClient() {
   const [fullName, setFullName] = useState("");
@@ -22,6 +23,8 @@ export default function SignupClient() {
   }>({});
 
   const router = useRouter();
+  const supabase = createSupabaseClient();
+ 
 
   const onRegister = async () => {
     const username = fullName.trim();
@@ -84,7 +87,7 @@ export default function SignupClient() {
       return;
     }
 
-    router.push("/auth/success?next=/dashboard");
+    router.push("/login");
   };
 
   const inputClass = (bad?: boolean) =>

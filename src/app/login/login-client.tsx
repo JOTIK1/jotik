@@ -1,16 +1,19 @@
 "use client";
-import { supabase } from "../../../lib/supabaseClient";
+
+import { createSupabaseClient } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import AuthCard from "@/app/components/AuthCard";
+import AuthCard from "../../app/components/AuthCard";
 import { Mail, Lock } from "lucide-react";
 import Link from "next/link";
-import BrandLogo from "@/app/components/brand-logo";
+import BrandLogo from "../../app/components/brand-logo";
 
 export default function LoginClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const supabase = createSupabaseClient();
+
 
   const onLogin = async () => {
     const { error } = await supabase.auth.signInWithPassword({
