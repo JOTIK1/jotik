@@ -32,64 +32,50 @@ export default function SignupClient() {
     const cleanPassword = password.trim();
     const invite = referral.trim();
   
-    // reset UI state
     setFormError(null);
     setFieldError({});
     setLoading(true);
   
-    // 1) client-side validation
+    // validations
     if (!username) {
-      setLoading(false);
       setFieldError({ username: true });
       setFormError("الاسم ضروري.");
+      setLoading(false);
       return;
     }
-  
     if (!cleanEmail) {
-      setLoading(false);
       setFieldError({ email: true });
       setFormError("الإيميل ضروري.");
+      setLoading(false);
       return;
     }
-  
     if (!cleanPassword) {
-      setLoading(false);
       setFieldError({ password: true });
       setFormError("كلمة السر ضرورية.");
+      setLoading(false);
       return;
     }
   
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 15000); // 15s timeout
+  
     try {
-      // 2) call your API (referral validation + profile creation etc.)
       const res = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: cleanEmail,
-          password: cleanPassword,
-          username,
-          invite, // مهم: نفس الاسم اللي يتوقعه الـ API
-        }),
+        signal: controller.signal,
+        body: JSON.stringify({ email: cleanEmail, password: cleanPassword, username, invite }),
       });
   
-      // حاول نقرأ JSON حتى لو السيرفر رجّع خطأ
       let data: any = null;
-      try {
-        data = await res.json();
-      } catch {
-        data = null;
-      }
+      try { data = await res.json(); } catch {}
   
-      // إذا API رجّع خطأ (مثلاً referral غلط)
-      if (!res.ok) {
-        const msg =
-          data?.message ||
-          (res.status === 400 ? "بيانات غير صحيحة." : "حدث خطأ في السيرفر.");
-  
-        setLoading(false);
+      // لو السيرفر يرجّع ok:false لكنه 200
+      if (!res.ok || data?.ok === false) {
+        const msg = data?.message || "Signup فشل. شوف السيرفر.";
         setFormError(msg);
   
-        const field = data?.field; // نتوقع: "username" | "invite" | "email" | "password"
+        const field = data?.field;
         if (field === "username") setFieldError({ username: true });
         else if (field === "invite") setFieldError({ invite: true });
         else if (field === "email") setFieldError({ email: true });
@@ -98,25 +84,27 @@ export default function SignupClient() {
         return;
       }
   
-      // 3) login with supabase
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
         password: cleanPassword,
       });
   
       if (error) {
-        setLoading(false);
         setFormError(error.message);
         setFieldError({ email: true, password: true });
         return;
       }
   
-      // 4) success
-      setLoading(false);
-      router.push("/login");
+      router.push("/auth/success?next=/dashboard");
     } catch (e: any) {
+      if (e?.name === "AbortError") {
+        setFormError("الطلب علّق أكثر من 15 ثانية: /api/signup ما يردّش.");
+      } else {
+        setFormError(e?.message || "خطأ غير معروف.");
+      }
+    } finally {
+      clearTimeout(t);
       setLoading(false);
-      setFormError(e?.message || "تعذر الاتصال بالسيرفر. حاول مرة أخرى.");
     }
   };
 
