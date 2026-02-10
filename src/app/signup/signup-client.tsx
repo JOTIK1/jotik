@@ -95,7 +95,7 @@ export default function SignupClient() {
         return;
       }
   
-      router.push("/auth/success?next=/dashboard");
+      router.push("/login");
     } catch (e: any) {
       if (e?.name === "AbortError") {
         setFormError("الطلب علّق أكثر من 15 ثانية: /api/signup ما يردّش.");
