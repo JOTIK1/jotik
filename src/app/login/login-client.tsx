@@ -26,7 +26,7 @@ export default function LoginClient() {
       return;
     }
 
-    router.push("/auth/success?next=/dashboard");
+    router.push("/dashboard");
   };
 
   return (
