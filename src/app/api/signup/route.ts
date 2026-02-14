@@ -130,7 +130,7 @@ export async function POST(req: Request) {
 
     const resend = new Resend(resendKey);
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || "JOTIK <onboarding@resend.dev>",
+      from: process.env.RESEND_FROM_EMAIL! ,
       to: email,
       subject: "Confirm your email - JOTIK",
       html: `

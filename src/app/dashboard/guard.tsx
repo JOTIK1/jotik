@@ -18,16 +18,25 @@ export default function DashboardGuard({ children }: { children: React.ReactNode
         return;
       }
 
-      const confirmed = !!data.user.email_confirmed_at;
-
-      if (!confirmed) {
-        router.replace(`/verify-email?email=${encodeURIComponent(data.user.email || "")}`);
-        setOk(false);
-        return;
-      }
-
-      setOk(true);
-    };
+      useEffect(() => {
+        const check = async () => {
+          const { data } = await supabase.auth.getUser();
+      
+          if (!data?.user) {
+            router.replace("/login");
+            return;
+          }
+      
+          if (!data.user.email_confirmed_at) {
+            router.replace("/verify-email");
+            return;
+          }
+      
+          setOk(true);
+        };
+      
+        check();
+      }, [router]);
 
     check();
   }, [router]);
