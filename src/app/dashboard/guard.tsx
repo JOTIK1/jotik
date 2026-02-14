@@ -18,29 +18,22 @@ export default function DashboardGuard({ children }: { children: React.ReactNode
         return;
       }
 
-      useEffect(() => {
-        const check = async () => {
-          const { data } = await supabase.auth.getUser();
-      
-          if (!data?.user) {
-            router.replace("/login");
-            return;
-          }
-      
-          if (!data.user.email_confirmed_at) {
-            router.replace("/verify-email");
-            return;
-          }
-      
-          setOk(true);
-        };
-      
-        check();
-      }, [router]);
+      const confirmed = !!data.user.email_confirmed_at;
+
+      if (!confirmed) {
+        router.replace(`/verify-email?email=${encodeURIComponent(data.user.email || "")}`);
+        setOk(false);
+        return;
+      }
+
+      setOk(true);
+    };
 
     check();
   }, [router]);
 
-  if (ok !== true) return null; // loading / redirect
+  if (ok !== true) {
+     return null; // loading / redirect
+  }
   return <>{children}</>;
 }
