@@ -95,7 +95,9 @@ export default function SignupClient() {
         return;
       }
   
-      router.push("/verify-email");
+      router.push(`/verify-email?email=${encodeURIComponent(cleanEmail)}`);
+        return;
+        
     } catch (e: any) {
       if (e?.name === "AbortError") {
         setFormError("الطلب علّق أكثر من 15 ثانية: /api/signup ما يردّش.");

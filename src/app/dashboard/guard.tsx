@@ -2,39 +2,36 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createSupabaseClient } from "../../../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 
-export default function DashboardGuard({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const supabase = createSupabaseClient();
+  const [ok, setOk] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkUser = async () => {
+    const check = async () => {
       const { data, error } = await supabase.auth.getUser();
 
       if (error || !data?.user) {
         router.replace("/login");
+        setOk(false);
         return;
       }
 
-      // :white_check_mark: تحقق من تأكيد الإيميل
-      if (!data.user.email_confirmed_at) {
-        router.replace("/verify-email");
+      const confirmed = !!data.user.email_confirmed_at;
+
+      if (!confirmed) {
+        router.replace(`/verify-email?email=${encodeURIComponent(data.user.email || "")}`);
+        setOk(false);
         return;
       }
 
-      setLoading(false);
+      setOk(true);
     };
 
-    checkUser();
+    check();
   }, [router]);
 
-  if (loading) return null; // تقدر تحط Spinner هنا
-
+  if (ok !== true) return null; // loading / redirect
   return <>{children}</>;
 }
