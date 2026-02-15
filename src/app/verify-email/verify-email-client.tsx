@@ -23,7 +23,7 @@ export default function VerifyEmailClient() {
       return;
     }
 
-    setMsg(":envelope_with_arrow: Please check your email and click the verification link.");
+    setMsg(" Email verified successfully.");
   }, [sp, router]);
 
   return (
@@ -33,7 +33,7 @@ export default function VerifyEmailClient() {
         <p className="mt-3 text-slate-700">{msg}</p>
 
         <div className="mt-6 text-sm text-slate-600">
-          If you already verified and still see this page, go to{" "}
+          now you can go to {" "}
           <button
             className="font-semibold text-blue-600 hover:text-blue-700"
             onClick={() => router.replace("/login")}
