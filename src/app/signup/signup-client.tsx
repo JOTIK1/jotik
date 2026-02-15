@@ -84,20 +84,20 @@ export default function SignupClient() {
         return;
       }
   
-      const { error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: cleanPassword,
-      });
+      //const { error } = await supabase.auth.signInWithPassword({
+        //email: cleanEmail,
+       // password: cleanPassword,
+      //});
   
-      if (error) {
-        setFormError(error.message);
-        setFieldError({ email: true, password: true });
-        return;
-      }
+      //if (error) {
+       // setFormError(error.message);
+        //setFieldError({ email: true, password: true });
+       // return;
+      //}
   
-      router.push(`/verify-email?email=${encodeURIComponent(cleanEmail)}`);
+      router.push(`/success?email=${encodeURIComponent(cleanEmail)}`);
         return;
-        
+
     } catch (e: any) {
       if (e?.name === "AbortError") {
         setFormError("الطلب علّق أكثر من 15 ثانية: /api/signup ما يردّش.");

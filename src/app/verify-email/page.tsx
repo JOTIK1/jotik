@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import VerifyEmailClient from "@/app/verify-email/verify-email-client";
 
-export const dynamic = "force-dynamic"; // يمنع مشاكل الـ prerender
+export const dynamic = "force-dynamic";
 
 export default function VerifyEmailPage() {
   return (
