@@ -23,7 +23,7 @@ export default function SuccessPage({ searchParams }: Props) {
         </div>
 
         <h1 className="mt-6 text-2xl font-bold text-slate-900">
-          Your account is created :tada:
+          Your account is created 
         </h1>
 
         <p className="mt-2 text-slate-700">
@@ -46,12 +46,6 @@ export default function SuccessPage({ searchParams }: Props) {
             Go to Login
           </Link>
 
-          <Link
-            href={email ? `/verify-email?email=${encodeURIComponent(email)}` : "/verify-email"}
-            className="w-full rounded-xl border border-slate-200 bg-white py-3 text-center font-semibold text-slate-900 hover:bg-slate-50"
-          >
-            I already clicked the link
-          </Link>
         </div>
 
         <p className="mt-5 text-xs text-slate-500">
