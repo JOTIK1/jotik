@@ -1,86 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 
-export default function VerifyEmailPage() {
-  const supabase = createSupabaseBrowserClient();
-  const [loading, setLoading] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  const [message, setMessage] = useState("");
+export default function VerifyEmailClient() {
+  const sp = useSearchParams();
+  const router = useRouter();
 
-  const resendEmail = async () => {
-    setLoading(true);
-    setMessage("");
+  const state = useMemo(() => {
+    const ok = sp.get("ok");
+    const err = sp.get("error");
 
-    const { data } = await supabase.auth.getUser();
-    const email = data.user?.email;
-
-    if (!email) {
-      setMessage("Unable to detect your email.");
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirmed`,
-      },
-    });
-
-    if (error) {
-      setMessage(error.message);
-      setLoading(false);
-      return;
-    }
-
-    setMessage("Verification email sent successfully :white_check_mark:");
-    setCooldown(30);
-
-    const timer = setInterval(() => {
-      setCooldown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    setLoading(false);
-  };
+    if (ok) return { type: "ok" as const, msg: ":white_check_mark: Email verified successfully. You can login now." };
+    if (err) return { type: "err" as const, msg: ":x: Verification failed. Please request a new email." };
+    return { type: "info" as const, msg: "Checking verification status..." };
+  }, [sp]);
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900">
-          Confirm your email
-        </h1>
+        <h1 className="text-2xl font-bold text-slate-900">Verify your email</h1>
 
-        <p className="mt-2 text-slate-700">
-          We’ve sent a verification link to your email address. Please check your inbox.
-        </p>
-
-        {message && (
-          <div className="mt-4 rounded-xl bg-green-50 p-3 text-sm text-green-700">
-            {message}
-          </div>
-        )}
+        <div
+          className={`mt-4 rounded-xl p-3 text-sm ${
+            state.type === "ok"
+              ? "bg-green-50 text-green-800 border border-green-200"
+              : state.type === "err"
+              ? "bg-red-50 text-red-800 border border-red-200"
+              : "bg-slate-50 text-slate-700 border border-slate-200"
+          }`}
+        >
+          {state.msg}
+        </div>
 
         <button
-          onClick={resendEmail}
-          disabled={loading || cooldown > 0}
-          className="mt-6 w-full rounded-xl bg-gradient-to-r from-blue-700 to-cyan-600 py-3 font-semibold text-white disabled:opacity-50"
+          onClick={() => router.replace("/login")}
+          className="mt-5 w-full rounded-xl bg-blue-600 px-4 py-3 text-white font-semibold hover:bg-blue-700"
         >
-          {cooldown > 0
-            ? `Resend in ${cooldown}s`
-            : loading
-            ? "Sending..."
-            : "Resend verification email"}
+          Go to Login
         </button>
       </div>
-    </main>
+    </div>
   );
 }
