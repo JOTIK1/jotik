@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation" ;
 
 export const dynamic = "force-dynamic";
 
@@ -7,6 +8,10 @@ export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getUser();
   const user = data.user!;
+
+  if ( !user.email_confirmed_at) {
+    return redirect("/verify-email") ;
+  }
 
   return (
     <main className="min-h-screen bg-slate-50">
