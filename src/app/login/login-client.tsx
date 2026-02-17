@@ -1,6 +1,6 @@
 "use client";
 
-import { createSupabaseClient } from "../../../lib/supabaseClient";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuthCard from "../../app/components/AuthCard";
@@ -12,12 +12,12 @@ export default function LoginClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const supabase = createSupabaseClient();
+  const supabase = createSupabaseBrowserClient();
 
 
   const onLogin = async () => {
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim() .toLowerCase() ,
       password,
     });
 
@@ -26,7 +26,7 @@ export default function LoginClient() {
       return;
     }
 
-    router.push("/dashboard");
+    router.replace("/dashboard");
   };
 
   return (
