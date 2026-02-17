@@ -95,7 +95,7 @@ export default function SignupClient() {
        // return;
       //}
   
-      router.push(`/success?email=${encodeURIComponent(cleanEmail)}`);
+      router.replace("/auth/verify-email");
         return;
 
     } catch (e: any) {
