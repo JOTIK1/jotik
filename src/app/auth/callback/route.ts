@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookies) {
+          // @ts-ignore
           cookies.forEach(({ name, value, options }) => {
             res.cookies.set(name, value, options);
           });
@@ -30,7 +31,6 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  // :white_check_mark: New Supabase email link uses ?code=
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) {
@@ -39,12 +39,16 @@ export async function GET(request: NextRequest) {
     return res;
   }
 
-  // :white_check_mark: Fallback: token_hash&type
   if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({ token_hash, type: type as any });
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash,
+      type: type as any,
+    });
+
     if (error) {
       return NextResponse.redirect(new URL("/verify-email?error=otp_failed", url.origin));
     }
+
     return res;
   }
 
